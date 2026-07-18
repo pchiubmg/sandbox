@@ -71,6 +71,7 @@ void setup() {
 void loop() {
   introSparkle();       // Draw-in border + starbursts using lines/circles
   beatingHeart();       // Pulsing heart next to "I love you Yan Yan"
+  encouragement();      // Typewriter pep talk for Yan Yan
   risingHearts();       // Little hearts floating up the screen
   scrollLoveMessage();  // Big 2x text sweeping across
 }
@@ -138,7 +139,51 @@ void beatingHeart() {
 }
 
 // ---------------------------------------------------------------------------
-// Scene 3: little hearts drift up the screen, like the snowflake demo but
+// Scene 3: a typewriter pep talk. The lines reveal one character at a time,
+// then a little heart bounces in as the "you've got this" beat.
+// ---------------------------------------------------------------------------
+void encouragement() {
+  // Four short lines that fit a 128x32 screen at text size 1 (8px per line).
+  const char* lines[] = {"Yan Yan, you can", "do ANYTHING", "if you put your",
+                         "mind to it!"};
+  const uint8_t lineCount = sizeof(lines) / sizeof(lines[0]);
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+
+  // Type the message out, character by character, keeping earlier lines up.
+  for (uint8_t ln = 0; ln < lineCount; ln++) {
+    uint8_t len = strlen(lines[ln]);
+    for (uint8_t c = 0; c <= len; c++) {
+      // Redraw everything typed so far.
+      display.clearDisplay();
+      for (uint8_t prev = 0; prev < ln; prev++) {
+        display.setCursor(2, prev * 8);
+        display.print(lines[prev]);
+      }
+      display.setCursor(2, ln * 8);
+      for (uint8_t k = 0; k < c; k++)
+        display.write(lines[ln][k]);
+      display.display();
+      delay(45);
+    }
+    delay(150);
+  }
+
+  delay(700);  // Let the whole message land before moving on.
+
+  // A reassuring heart pops in, growing from nothing.
+  for (int16_t r = 2; r <= 12; r += 2) {
+    drawHeart(display.width() / 2, display.height() / 2, r);
+    display.display();
+    delay(60);
+  }
+  delay(500);
+}
+
+// ---------------------------------------------------------------------------
+// Scene 4: little hearts drift up the screen, like the snowflake demo but
 // happier. Shows off drawBitmap animation.
 // ---------------------------------------------------------------------------
 void risingHearts() {
@@ -169,7 +214,7 @@ void risingHearts() {
 }
 
 // ---------------------------------------------------------------------------
-// Scene 4: the big finale message slides across the screen, then uses the
+// Scene 5: the big finale message slides across the screen, then uses the
 // SSD1306 hardware scroll for a little sparkle. Shows off setTextSize + scroll.
 // ---------------------------------------------------------------------------
 void scrollLoveMessage() {
