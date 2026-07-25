@@ -28,3 +28,9 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Output from scripts/gcp-security: audit reports, IAM policy backups and
+# instance dumps. These are a full inventory of a live project.
+gcp-audit-*/
+iam-policy-backup-*.json
+instance-*.json
